@@ -1,44 +1,67 @@
-const mongoose = require('mongoose');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-const supplementSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please add a name'],
+const Supplement = sequelize.define('Supplement', {
+  supplement_id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  brand: {
+    type: DataTypes.STRING,
+    allowNull: true
   },
   description: {
-    type: String,
-    required: [true, 'Please add a description'],
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  target_animal: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  ingredients: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  dosage_amount: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  dosage_unit: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  dosage_frequency: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  net_weight: {
+    type: DataTypes.STRING,
+    allowNull: true
   },
   price: {
-    type: Number,
-    required: [true, 'Please specify the price'],
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false
   },
-  stock: {
-    type: Number,
-    required: [true, 'Please specify the stock quantity'],
-    min: 0,
+  stock_quantity: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0
   },
-  category: {
-    type: String,
-    required: [true, 'Please specify the category'],
-    enum: ['vitamin', 'mineral', 'protein', 'other'],
+  status: {
+    type: DataTypes.ENUM('Available', 'Out of Stock'),
+    defaultValue: 'Available'
   },
-  image: {
-    type: String,
-    required: [true, 'Please add an image'],
-  },
-  manufacturer: {
-    type: String,
-    required: [true, 'Please specify the manufacturer'],
-  },
-  expiryDate: {
-    type: Date,
-    required: [true, 'Please specify the expiry date'],
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  date_added: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  }
+}, {
+  tableName: 'supplements',
+  timestamps: false
 });
 
-module.exports = mongoose.model('Supplement', supplementSchema); 
+module.exports = Supplement; 
