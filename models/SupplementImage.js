@@ -29,4 +29,12 @@ const SupplementImage = sequelize.define('SupplementImage', {
   timestamps: false
 });
 
+// Define associations
+SupplementImage.associate = (models) => {
+  SupplementImage.belongsTo(models.Supplement, {
+    foreignKey: 'supplement_id',
+    as: 'supplement'
+  });
+};
+
 module.exports = SupplementImage; 

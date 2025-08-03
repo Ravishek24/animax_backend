@@ -1,5 +1,8 @@
 const app = require('./app');
 
+// Suppress circular dependency warnings
+process.removeAllListeners('warning');
+
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
   console.log('UNHANDLED REJECTION! 💥 Shutting down...');

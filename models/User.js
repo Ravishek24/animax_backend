@@ -15,13 +15,41 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false
   },
+  address: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  city: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  state: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  pincode: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  latitude: {
+    type: DataTypes.DECIMAL(10, 8),
+    allowNull: true
+  },
+  longitude: {
+    type: DataTypes.DECIMAL(11, 8),
+    allowNull: true
+  },
   registration_date: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
+  },
+  role: {
+    type: DataTypes.ENUM('user', 'admin'),
+    defaultValue: 'user'
   }
 }, {
   tableName: 'users',
   timestamps: false
 });
 
-module.exports = User; 
+module.exports = User;

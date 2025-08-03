@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>पशुपालन मंच - Admin Panel</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: linear-gradient(180deg, #ff3b3b 0%, #d32f2f 100%);
+            color: white;
+            padding: 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .logo-text {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .admin-title {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            padding: 0 20px 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            opacity: 0.7;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #ffcc00;
+        }
+
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            border-left-color: #ffcc00;
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: 12px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 0;
+        }
+
+        .topbar {
+            background: white;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-btn {
+            position: relative;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #666;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .notification-btn:hover {
+            background: #f0f0f0;
+            color: #ff3b3b;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #ff3b3b;
+            color: white;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-profile:hover {
+            background: #f0f0f0;
+        }
+
+        .admin-avatar {
+            width: 35px;
+            height: 35px;
+            background: #ff3b3b;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .content-area {
+            padding: 30px;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Dashboard Styles */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .stat-icon.users { background: #4CAF50; }
+        .stat-icon.animals { background: #ff9800; }
+        .stat-icon.products { background: #2196F3; }
+        .stat-icon.revenue { background: #9C27B0; }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        .stat-change.positive { color: #4CAF50; }
+        .stat-change.negative { color: #f44336; }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Tables */
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background: #ff3b3b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #d32f2f;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #000;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-active { background: #d4edda; color: #155724; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-inactive { background: #f8d7da; color: #721c24; }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #ff3b3b;
+            box-shadow: 0 0 0 2px rgba(255,59,59,0.1);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .filter-select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .image-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .recent-activities {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: white;
+        }
+
+        .activity-icon.user { background: #4CAF50; }
+        .activity-icon.animal { background: #ff9800; }
+        .activity-icon.product { background: #2196F3; }
+        .activity-icon.order { background: #9C27B0; }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Loading and Error States */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar-header .logo-text,
+            .sidebar-header .admin-title,
+            .nav-section-title,
+            .nav-item span {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 60px;
+            }
+
+            .topbar {
+                padding: 15px 20px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:5000/api';
+        const ADMIN_TOKEN = localStorage.getItem('adminToken') || '';
+
+        // API Service Functions
+        const apiService = {
+            // Authentication
+            login: async (credentials) => {
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(credentials)
+                });
+                return response.json();
+            },
+
+            // Supplements/Products
+            getSupplements: async (page = 1, limit = 10, search = '', status = '') => {
+                const params = new URLSearchParams({
+                    page, limit, ...(search && { search }), ...(status && { status })
+                });
+                const response = await fetch(`${API_BASE_URL}/admin/supplements?${params}`, {
+                    headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+                });
+                return response.json();
+            },
+
+            createSupplement: async (supplementData) => {
+                const response = await fetch(`${API_BASE_URL}/admin/supplements`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(supplementData)
+                });
+                return response.json();
+            },
+
+            updateSupplement: async (id, supplementData) => {
+                const response = await fetch(`${API_BASE_URL}/admin/supplements/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${ADMIN_TOKEN}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(supplementData)
+                });
+                return response.json();
+            },
+
+            deleteSupplement: async (id) => {
+                const response = await fetch(`${API_BASE_URL}/admin/supplements/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+                });
+                return response.json();
+            },
+
+            uploadImages: async (supplementId, imageFiles) => {
+                const formData = new FormData();
+                imageFiles.forEach(file => {
+                    formData.append('images', file);
+                });
+
+                const response = await fetch(`${API_BASE_URL}/admin/supplements/${supplementId}/images`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` },
+                    body: formData
+                });
+                return response.json();
+            },
+
+            // Orders
+            getOrders: async () => {
+                const response = await fetch(`${API_BASE_URL}/admin/orders`, {
+                    headers: { 'Authorization': `Bearer ${ADMIN_TOKEN}` }
+                });
+                return response.json();
+            }
+        };
+
+        // Main App Component
+        function AdminPanel() {
+            const [activeSection, setActiveSection] = useState('dashboard');
+            const [showModal, setShowModal] = useState(false);
+            const [modalContent, setModalContent] = useState(null);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [filterStatus, setFilterStatus] = useState('all');
+            
+            // Data states
+            const [supplements, setSupplements] = useState([]);
+            const [orders, setOrders] = useState([]);
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+            const [success, setSuccess] = useState('');
+            
+            // Form states
+            const [productForm, setProductForm] = useState({
+                title: '',
+                brand: '',
+                description: '',
+                target_animal: '',
+                ingredients: '',
+                dosage_amount: '',
+                dosage_unit: '',
+                dosage_frequency: '',
+                net_weight: '',
+                price: '',
+                stock_quantity: '',
+                status: 'Available'
+            });
+
+            // Dashboard data
+            const stats = {
+                totalUsers: 1247,
+                activeAnimals: 342,
+                totalProducts: supplements.length,
+                monthlyRevenue: 245780
+            };
+
+            const recentActivities = [
+                { type: 'user', icon: 'fas fa-user-plus', text: 'नया उपयोगकर्ता Rajesh Kumar ने पंजीकरण किया', time: '2 मिनट पहले' },
+                { type: 'animal', icon: 'fas fa-cow', text: 'गाय #1234 सफलतापूर्वक बेची गई', time: '15 मिनट पहले' },
+                { type: 'product', icon: 'fas fa-box', text: 'नया उत्पाद "ऑर्गेनिक फीड" जोड़ा गया', time: '1 घंटे पहले' },
+                { type: 'order', icon: 'fas fa-shopping-cart', text: 'ऑर्डर #5678 डिलीवर किया गया', time: '2 घंटे पहले' },
+            ];
+
+            // Load data functions
+            const loadSupplements = async () => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await apiService.getSupplements();
+                    if (response.success) {
+                        setSupplements(response.data);
+                    } else {
+                        setError(response.message || 'Failed to load supplements');
+                    }
+                } catch (err) {
+                    setError('Network error: ' + err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const loadOrders = async () => {
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await apiService.getOrders();
+                    if (response.success) {
+                        setOrders(response.data);
+                    } else {
+                        setError(response.message || 'Failed to load orders');
+                    }
+                } catch (err) {
+                    setError('Network error: ' + err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            // Load data when section changes
+            useEffect(() => {
+                if (activeSection === 'products') {
+                    loadSupplements();
+                } else if (activeSection === 'orders') {
+                    loadOrders();
+                }
+            }, [activeSection]);
+
+            const openModal = (content) => {
+                setModalContent(content);
+                setShowModal(true);
+                // Reset form when opening add product modal
+                if (content === 'addProduct') {
+                    setProductForm({
+                        title: '',
+                        brand: '',
+                        description: '',
+                        target_animal: '',
+                        ingredients: '',
+                        dosage_amount: '',
+                        dosage_unit: '',
+                        dosage_frequency: '',
+                        net_weight: '',
+                        price: '',
+                        stock_quantity: '',
+                        status: 'Available'
+                    });
+                }
+            };
+
+            const closeModal = () => {
+                setShowModal(false);
+                setModalContent(null);
+                setError('');
+                setSuccess('');
+            };
+
+            const handleProductFormChange = (field, value) => {
+                setProductForm(prev => ({
+                    ...prev,
+                    [field]: value
+                }));
+            };
+
+            const handleCreateProduct = async () => {
+                setLoading(true);
+                setError('');
+                setSuccess('');
+
+                try {
+                    const response = await apiService.createSupplement(productForm);
+                    if (response.success) {
+                        setSuccess('Product created successfully!');
+                        closeModal();
+                        loadSupplements(); // Reload the list
+                    } else {
+                        setError(response.message || 'Failed to create product');
+                    }
+                } catch (err) {
+                    setError('Network error: ' + err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleDeleteProduct = async (id) => {
+                if (!confirm('Are you sure you want to delete this product?')) return;
+
+                setLoading(true);
+                setError('');
+                try {
+                    const response = await apiService.deleteSupplement(id);
+                    if (response.success) {
+                        setSuccess('Product deleted successfully!');
+                        loadSupplements(); // Reload the list
+                    } else {
+                        setError(response.message || 'Failed to delete product');
+                    }
+                } catch (err) {
+                    setError('Network error: ' + err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const renderDashboard = () => (
+                <div>
+                    <div className="dashboard-grid">
+                        <div className="stat-card">
+                            <div className="stat-header">
+                                <div className="stat-icon users">
+                                    <i className="fas fa-users"></i>
+                                </div>
+                            </div>
+                            <div className="stat-value">{stats.totalUsers.toLocaleString()}</div>
+                            <div className="stat-label">कुल उपयोगकर्ता</div>
+                            <div className="stat-change positive">
+                                <i className="fas fa-arrow-up"></i>
+                                +12% इस महीने
+                            </div>
+                        </div>
+
+                        <div className="stat-card">
+                            <div className="stat-header">
+                                <div className="stat-icon animals">
+                                    <i className="fas fa-cow"></i>
+                                </div>
+                            </div>
+                            <div className="stat-value">{stats.activeAnimals}</div>
+                            <div className="stat-label">सक्रिय पशु लिस्टिंग</div>
+                            <div className="stat-change positive">
+                                <i className="fas fa-arrow-up"></i>
+                                +8% इस सप्ताह
+                            </div>
+                        </div>
+
+                        <div className="stat-card">
+                            <div className="stat-header">
+                                <div className="stat-icon products">
+                                    <i className="fas fa-box"></i>
+                                </div>
+                            </div>
+                            <div className="stat-value">{stats.totalProducts}</div>
+                            <div className="stat-label">कुल उत्पाद</div>
+                            <div className="stat-change positive">
+                                <i className="fas fa-arrow-up"></i>
+                                +5 नए उत्पाद
+                            </div>
+                        </div>
+
+                        <div className="stat-card">
+                            <div className="stat-header">
+                                <div className="stat-icon revenue">
+                                    <i className="fas fa-rupee-sign"></i>
+                                </div>
+                            </div>
+                            <div className="stat-value">₹{stats.monthlyRevenue.toLocaleString()}</div>
+                            <div className="stat-label">मासिक आय</div>
+                            <div className="stat-change positive">
+                                <i className="fas fa-arrow-up"></i>
+                                +15% पिछले महीने से
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="charts-grid">
+                        <div className="chart-card">
+                            <h3 className="chart-title">मासिक बिक्री रिपोर्ट</h3>
+                            <canvas id="salesChart" width="400" height="200"></canvas>
+                        </div>
+                        
+                        <div className="recent-activities">
+                            <h3 className="chart-title">हाल की गतिविधियां</h3>
+                            {recentActivities.map((activity, index) => (
+                                <div key={index} className="activity-item">
+                                    <div className={`activity-icon ${activity.type}`}>
+                                        <i className={activity.icon}></i>
+                                    </div>
+                                    <div className="activity-content">
+                                        <div className="activity-text">{activity.text}</div>
+                                        <div className="activity-time">{activity.time}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const renderProducts = () => (
+                <div className="table-card">
+                    <div className="table-header">
+                        <h3 className="table-title">उत्पाद प्रबंधन</h3>
+                        <button className="btn btn-primary" onClick={() => openModal('addProduct')}>
+                            <i className="fas fa-plus"></i> नया उत्पाद जोड़ें
+                        </button>
+                    </div>
+
+                    {error && <div className="error">{error}</div>}
+                    {success && <div className="success">{success}</div>}
+
+                    {loading ? (
+                        <div className="loading">
+                            <i className="fas fa-spinner fa-spin"></i> Loading products...
+                        </div>
+                    ) : (
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>उत्पाद का नाम</th>
+                                    <th>ब्रांड</th>
+                                    <th>मूल्य</th>
+                                    <th>स्टॉक</th>
+                                    <th>स्थिति</th>
+                                    <th>तारीख</th>
+                                    <th>कार्य</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {supplements.map(product => (
+                                    <tr key={product.supplement_id}>
+                                        <td>{product.title}</td>
+                                        <td>{product.brand || '-'}</td>
+                                        <td>₹{product.price}</td>
+                                        <td>
+                                            <span className={product.stock_quantity === 0 ? 'status-badge status-inactive' : 'status-badge status-active'}>
+                                                {product.stock_quantity} इकाई
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span className={`status-badge status-${product.status === 'Available' ? 'active' : 'inactive'}`}>
+                                                {product.status === 'Available' ? 'उपलब्ध' : 'स्टॉक में नहीं'}
+                                            </span>
+                                        </td>
+                                        <td>{new Date(product.date_added).toLocaleDateString('hi-IN')}</td>
+                                        <td>
+                                            <button className="btn btn-warning" style={{marginRight: '5px'}}>
+                                                <i className="fas fa-edit"></i>
+                                            </button>
+                                            <button 
+                                                className="btn btn-danger"
+                                                onClick={() => handleDeleteProduct(product.supplement_id)}
+                                            >
+                                                <i className="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            );
+
+            const renderOrders = () => (
+                <div className="table-card">
+                    <div className="table-header">
+                        <h3 className="table-title">ऑर्डर प्रबंधन</h3>
+                        <button className="btn btn-primary">
+                            <i className="fas fa-download"></i> रिपोर्ट डाउनलोड करें
+                        </button>
+                    </div>
+
+                    {error && <div className="error">{error}</div>}
+                    {success && <div className="success">{success}</div>}
+
+                    {loading ? (
+                        <div className="loading">
+                            <i className="fas fa-spinner fa-spin"></i> Loading orders...
+                        </div>
+                    ) : (
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>ऑर्डर ID</th>
+                                    <th>ग्राहक</th>
+                                    <th>उत्पाद</th>
+                                    <th>मात्रा</th>
+                                    <th>कुल राशि</th>
+                                    <th>स्थिति</th>
+                                    <th>तारीख</th>
+                                    <th>कार्य</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orders.map(order => (
+                                    <tr key={order.order_id}>
+                                        <td>#{order.order_id.toString().padStart(4, '0')}</td>
+                                        <td>{order.user?.full_name || 'Unknown'}</td>
+                                        <td>{order.items?.[0]?.product_name || 'N/A'}</td>
+                                        <td>{order.items?.length || 0}</td>
+                                        <td>₹{order.total_amount || 0}</td>
+                                        <td>
+                                            <span className={`status-badge status-${order.status === 'completed' ? 'active' : 'pending'}`}>
+                                                {order.status === 'completed' ? 'पूर्ण' : 'लंबित'}
+                                            </span>
+                                        </td>
+                                        <td>{new Date(order.created_at).toLocaleDateString('hi-IN')}</td>
+                                        <td>
+                                            <button className="btn btn-success" style={{marginRight: '5px'}}>
+                                                <i className="fas fa-eye"></i>
+                                            </button>
+                                            <button className="btn btn-warning">
+                                                <i className="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    )}
+                </div>
+            );
+
+            const renderModal = () => {
+                if (!showModal || !modalContent) return null;
+
+                let modalTitle = '';
+                let modalBody = null;
+
+                switch (modalContent) {
+                    case 'addProduct':
+                        modalTitle = 'नया उत्पाद जोड़ें';
+                        modalBody = (
+                            <div className="form-grid">
+                                <div className="form-group">
+                                    <label className="form-label">उत्पाद का नाम *</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        placeholder="उत्पाद का नाम दर्ज करें"
+                                        value={productForm.title}
+                                        onChange={(e) => handleProductFormChange('title', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">ब्रांड</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        placeholder="ब्रांड का नाम"
+                                        value={productForm.brand}
+                                        onChange={(e) => handleProductFormChange('brand', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">मूल्य (₹) *</label>
+                                    <input 
+                                        type="number" 
+                                        className="form-control" 
+                                        placeholder="जैसे: 850"
+                                        value={productForm.price}
+                                        onChange={(e) => handleProductFormChange('price', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">स्टॉक मात्रा *</label>
+                                    <input 
+                                        type="number" 
+                                        className="form-control" 
+                                        placeholder="जैसे: 100"
+                                        value={productForm.stock_quantity}
+                                        onChange={(e) => handleProductFormChange('stock_quantity', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">लक्षित पशु</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        placeholder="जैसे: गाय, भैंस"
+                                        value={productForm.target_animal}
+                                        onChange={(e) => handleProductFormChange('target_animal', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">वजन/आकार</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        placeholder="जैसे: 20 किलो, 500 ग्राम"
+                                        value={productForm.net_weight}
+                                        onChange={(e) => handleProductFormChange('net_weight', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">खुराक मात्रा</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        placeholder="जैसे: 10"
+                                        value={productForm.dosage_amount}
+                                        onChange={(e) => handleProductFormChange('dosage_amount', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">खुराक इकाई</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        placeholder="जैसे: ml, ग्राम"
+                                        value={productForm.dosage_unit}
+                                        onChange={(e) => handleProductFormChange('dosage_unit', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">खुराक आवृत्ति</label>
+                                    <input 
+                                        type="text" 
+                                        className="form-control" 
+                                        placeholder="जैसे: दैनिक, साप्ताहिक"
+                                        value={productForm.dosage_frequency}
+                                        onChange={(e) => handleProductFormChange('dosage_frequency', e.target.value)}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">स्थिति</label>
+                                    <select 
+                                        className="form-control"
+                                        value={productForm.status}
+                                        onChange={(e) => handleProductFormChange('status', e.target.value)}
+                                    >
+                                        <option value="Available">उपलब्ध</option>
+                                        <option value="Out of Stock">स्टॉक में नहीं</option>
+                                    </select>
+                                </div>
+                                <div className="form-group" style={{gridColumn: '1 / -1'}}>
+                                    <label className="form-label">विवरण</label>
+                                    <textarea 
+                                        className="form-control" 
+                                        rows="4" 
+                                        placeholder="उत्पाद का विस्तृत विवरण"
+                                        value={productForm.description}
+                                        onChange={(e) => handleProductFormChange('description', e.target.value)}
+                                    ></textarea>
+                                </div>
+                                <div className="form-group" style={{gridColumn: '1 / -1'}}>
+                                    <label className="form-label">सामग्री</label>
+                                    <textarea 
+                                        className="form-control" 
+                                        rows="4" 
+                                        placeholder="उत्पाद की सामग्री"
+                                        value={productForm.ingredients}
+                                        onChange={(e) => handleProductFormChange('ingredients', e.target.value)}
+                                    ></textarea>
+                                </div>
+                            </div>
+                        );
+                        break;
+                }
+
+                return (
+                    <div className="modal-overlay" onClick={closeModal}>
+                        <div className="modal" onClick={(e) => e.stopPropagation()}>
+                            <div className="modal-header">
+                                <h2 className="modal-title">{modalTitle}</h2>
+                                <button className="close-btn" onClick={closeModal}>
+                                    <i className="fas fa-times"></i>
+                                </button>
+                            </div>
+                            {error && <div className="error">{error}</div>}
+                            {success && <div className="success">{success}</div>}
+                            {modalBody}
+                            <div style={{marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end'}}>
+                                <button className="btn btn-secondary" onClick={closeModal}>रद्द करें</button>
+                                <button 
+                                    className="btn btn-primary" 
+                                    onClick={handleCreateProduct}
+                                    disabled={loading}
+                                >
+                                    {loading ? <i className="fas fa-spinner fa-spin"></i> : 'सहेजें'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderContent = () => {
+                switch (activeSection) {
+                    case 'dashboard':
+                        return renderDashboard();
+                    case 'products':
+                        return renderProducts();
+                    case 'orders':
+                        return renderOrders();
+                    default:
+                        return renderDashboard();
+                }
+            };
+
+            // Initialize charts when dashboard is loaded
+            useEffect(() => {
+                if (activeSection === 'dashboard') {
+                    setTimeout(() => {
+                        const ctx = document.getElementById('salesChart');
+                        if (ctx && window.Chart) {
+                            new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: ['जन', 'फ़र', 'मार', 'अप्र', 'मई', 'जून'],
+                                    datasets: [{
+                                        label: 'बिक्री (₹)',
+                                        data: [180000, 195000, 210000, 235000, 225000, 245000],
+                                        borderColor: '#ff3b3b',
+                                        backgroundColor: 'rgba(255, 59, 59, 0.1)',
+                                        tension: 0.4,
+                                        fill: true
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        }
+                                    },
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {
+                                                callback: function(value) {
+                                                    return '₹' + (value / 1000) + 'K';
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }, 100);
+                }
+            }, [activeSection]);
+
+            return (
+                <div className="admin-container">
+                    {/* Sidebar */}
+                    <div className="sidebar">
+                        <div className="sidebar-header">
+                            <div className="logo">
+                                <i className="fas fa-cow"></i>
+                                <span className="logo-text">पशुपालन मंच</span>
+                            </div>
+                            <div className="admin-title">Admin Panel</div>
+                        </div>
+
+                        <nav className="nav-menu">
+                            <div className="nav-section">
+                                <div className="nav-section-title">Main</div>
+                                <div 
+                                    className={`nav-item ${activeSection === 'dashboard' ? 'active' : ''}`}
+                                    onClick={() => setActiveSection('dashboard')}
+                                >
+                                    <i className="fas fa-chart-line"></i>
+                                    <span>डैशबोर्ड</span>
+                                </div>
+                            </div>
+
+                            <div className="nav-section">
+                                <div className="nav-section-title">Management</div>
+                                <div 
+                                    className={`nav-item ${activeSection === 'products' ? 'active' : ''}`}
+                                    onClick={() => setActiveSection('products')}
+                                >
+                                    <i className="fas fa-box"></i>
+                                    <span>उत्पाद</span>
+                                </div>
+                                <div 
+                                    className={`nav-item ${activeSection === 'orders' ? 'active' : ''}`}
+                                    onClick={() => setActiveSection('orders')}
+                                >
+                                    <i className="fas fa-shopping-cart"></i>
+                                    <span>ऑर्डर</span>
+                                </div>
+                            </div>
+
+                            <div className="nav-section">
+                                <div className="nav-section-title">System</div>
+                                <div className="nav-item">
+                                    <i className="fas fa-cog"></i>
+                                    <span>सेटिंग्स</span>
+                                </div>
+                                <div className="nav-item">
+                                    <i className="fas fa-sign-out-alt"></i>
+                                    <span>लॉगआउट</span>
+                                </div>
+                            </div>
+                        </nav>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="main-content">
+                        {/* Top Bar */}
+                        <div className="topbar">
+                            <h1 className="page-title">
+                                {activeSection === 'dashboard' && 'डैशबोर्ड'}
+                                {activeSection === 'products' && 'उत्पाद प्रबंधन'}
+                                {activeSection === 'orders' && 'ऑर्डर प्रबंधन'}
+                            </h1>
+                            
+                            <div className="topbar-actions">
+                                <button className="notification-btn">
+                                    <i className="fas fa-bell"></i>
+                                    <span className="notification-badge">5</span>
+                                </button>
+                                
+                                <div className="admin-profile">
+                                    <div className="admin-avatar">A</div>
+                                    <span>Admin</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Content Area */}
+                        <div className="content-area">
+                            {renderContent()}
+                        </div>
+                    </div>
+
+                    {/* Modal */}
+                    {renderModal()}
+                </div>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<AdminPanel />, document.getElementById('root'));
+    </script>
+</body>
+</html> 

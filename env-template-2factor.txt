@@ -1,0 +1,28 @@
+# Database Configuration
+DB_HOST=localhost
+DB_USER=your_database_user
+DB_PASSWORD=your_database_password
+DB_NAME=your_database_name
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-here
+
+# 2Factor API Configuration (Only API key is required for SMS)
+TWO_FACTOR_API_KEY=your-2factor-api-key-here
+TWO_FACTOR_SENDER_ID=PASHUP
+TWO_FACTOR_BRAND_NAME=Pashupalak Manch
+
+# Server Configuration
+PORT=5000
+NODE_ENV=development
+
+# AWS S3 Configuration (if using)
+AWS_ACCESS_KEY_ID=your-aws-access-key
+AWS_SECRET_ACCESS_KEY=your-aws-secret-key
+AWS_REGION=your-aws-region
+AWS_S3_BUCKET=your-s3-bucket-name
+
+# PayU Configuration (if using)
+PAYU_MERCHANT_KEY=your-payu-merchant-key
+PAYU_MERCHANT_SALT=your-payu-merchant-salt
+PAYU_AUTH_HEADER=your-payu-auth-header

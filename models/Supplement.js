@@ -64,4 +64,12 @@ const Supplement = sequelize.define('Supplement', {
   timestamps: false
 });
 
+// Define associations
+Supplement.associate = (models) => {
+  Supplement.hasMany(models.SupplementImage, {
+    foreignKey: 'supplement_id',
+    as: 'images'
+  });
+};
+
 module.exports = Supplement; 

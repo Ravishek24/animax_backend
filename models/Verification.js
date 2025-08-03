@@ -62,7 +62,7 @@ const Verification = sequelize.define('Verification', {
     }
 }, {
     tableName: 'verifications',
-    timestamps: true,
+    timestamps: false, // Disable timestamps since they don't exist in the database
     indexes: [
         {
             unique: true,

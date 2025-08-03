@@ -7,5 +7,5 @@ module.exports = {
     brandName: process.env.PLIVO_BRAND_NAME || 'Pashupalan',
     defaultChannel: 'sms', // 'sms' or 'voice'
     codeLength: 6,
-    callbackUrl: process.env.PLIVO_CALLBACK_URL || 'https://your-domain.com/api/verify/callback'
+    callbackUrl: process.env.PLIVO_CALLBACK_URL || 'https://api.sociamosaic.com/api/verify/callback'
 }; 
